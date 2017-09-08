@@ -1,0 +1,16 @@
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\bin\Debug\DESEditor.exe.config
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\bin\Debug\DESEditor.exe
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\bin\Debug\DESEditor.pdb
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.csprojResolveAssemblyReference.cache
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.ActionOverviewPanel.resources
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.RequirementPanel.resources
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.Main.resources
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.Properties.Resources.resources
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.csproj.GenerateResource.Cache
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.csproj.CoreCompileInputs.cache
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.exe
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.pdb
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\bin\Debug\DES.exe
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\bin\Debug\DES.pdb
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\bin\Debug\DES.exe.config
+C:\Users\FreakingBarbarians\Documents\Visual Studio 2017\Projects\DESEditor\DESEditor\obj\Debug\DESEditor.EffectsPanel.resources
