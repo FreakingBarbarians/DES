@@ -34,12 +34,13 @@
             this.newActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveCurrentActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportCurrentActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tv = new System.Windows.Forms.TreeView();
             this.DynamicSpace = new System.Windows.Forms.Panel();
             this.AddEffectContext = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.testAddToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AddEffectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.saveActionDialog = new System.Windows.Forms.SaveFileDialog();
             this.AddRequirementContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addRequirementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.EffectContext = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -47,6 +48,7 @@
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.exportActionDialog = new System.Windows.Forms.SaveFileDialog();
             this.menuStrip1.SuspendLayout();
             this.AddEffectContext.SuspendLayout();
             this.AddRequirementContext.SuspendLayout();
@@ -70,7 +72,8 @@
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newActionToolStripMenuItem,
             this.loadActionToolStripMenuItem,
-            this.saveCurrentActionToolStripMenuItem});
+            this.saveCurrentActionToolStripMenuItem,
+            this.exportCurrentActionToolStripMenuItem});
             this.toolStripMenuItem1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
@@ -97,6 +100,13 @@
             this.saveCurrentActionToolStripMenuItem.Text = "Save Current Action";
             this.saveCurrentActionToolStripMenuItem.Click += new System.EventHandler(this.saveCurrentActionToolStripMenuItem_Click);
             // 
+            // exportCurrentActionToolStripMenuItem
+            // 
+            this.exportCurrentActionToolStripMenuItem.Name = "exportCurrentActionToolStripMenuItem";
+            this.exportCurrentActionToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.exportCurrentActionToolStripMenuItem.Text = "Export Current Action";
+            this.exportCurrentActionToolStripMenuItem.Click += new System.EventHandler(this.exportCurrentAction);
+            // 
             // tv
             // 
             this.tv.Dock = System.Windows.Forms.DockStyle.Left;
@@ -115,29 +125,30 @@
             this.DynamicSpace.Name = "DynamicSpace";
             this.DynamicSpace.Size = new System.Drawing.Size(722, 396);
             this.DynamicSpace.TabIndex = 3;
+            this.DynamicSpace.Paint += new System.Windows.Forms.PaintEventHandler(this.DynamicSpace_Paint);
             // 
             // AddEffectContext
             // 
             this.AddEffectContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.testAddToolStripMenuItem});
+            this.AddEffectToolStripMenuItem});
             this.AddEffectContext.Name = "contextMenuStrip1";
             this.AddEffectContext.Size = new System.Drawing.Size(127, 26);
             // 
-            // testAddToolStripMenuItem
+            // AddEffectToolStripMenuItem
             // 
-            this.testAddToolStripMenuItem.Name = "testAddToolStripMenuItem";
-            this.testAddToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-            this.testAddToolStripMenuItem.Text = "AddEffect";
-            this.testAddToolStripMenuItem.Click += new System.EventHandler(this.testAddToolStripMenuItem_Click);
+            this.AddEffectToolStripMenuItem.Name = "AddEffectToolStripMenuItem";
+            this.AddEffectToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.AddEffectToolStripMenuItem.Text = "AddEffect";
+            this.AddEffectToolStripMenuItem.Click += new System.EventHandler(this.AddEffectToolstripItem);
             // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
-            // saveFileDialog1
+            // saveActionDialog
             // 
-            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
+            this.saveActionDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
             // AddRequirementContext
             // 
@@ -151,7 +162,7 @@
             this.addRequirementToolStripMenuItem.Name = "addRequirementToolStripMenuItem";
             this.addRequirementToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.addRequirementToolStripMenuItem.Text = "AddRequirement";
-            this.addRequirementToolStripMenuItem.Click += new System.EventHandler(this.addRequirementToolStripMenuItem_Click);
+            this.addRequirementToolStripMenuItem.Click += new System.EventHandler(this.AddRequirementToolstripItem);
             // 
             // EffectContext
             // 
@@ -167,7 +178,7 @@
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteEffectToolstripItem);
             // 
             // copyToolStripMenuItem
             // 
@@ -185,6 +196,10 @@
             // 
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            // 
+            // exportActionDialog
+            // 
+            this.exportActionDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.exportActionDialog_FileOk);
             // 
             // Main
             // 
@@ -216,12 +231,12 @@
         private System.Windows.Forms.TreeView tv;
         private System.Windows.Forms.Panel DynamicSpace;
         private System.Windows.Forms.ContextMenuStrip AddEffectContext;
-        private System.Windows.Forms.ToolStripMenuItem testAddToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem AddEffectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newActionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadActionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveCurrentActionToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.SaveFileDialog saveActionDialog;
         private System.Windows.Forms.ContextMenuStrip AddRequirementContext;
         private System.Windows.Forms.ToolStripMenuItem addRequirementToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip EffectContext;
@@ -229,6 +244,8 @@
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem exportCurrentActionToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog exportActionDialog;
     }
 }
 

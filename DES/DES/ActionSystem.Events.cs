@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DES
 {
+    [Serializable]
     public partial class ActionSystem
     {
 

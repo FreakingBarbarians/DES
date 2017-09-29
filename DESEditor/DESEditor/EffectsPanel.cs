@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using DES;
@@ -9,37 +10,21 @@ namespace DESEditor
     public partial class EffectsPanel : UserControl
     {
 
-        Effect workingData;
+        EffectTemplateWrapper workingData;
+
+        public bool CodeDirty = false;
 
         public EffectsPanel()
         {
             InitializeComponent();
-            workingData = new Effect();
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox1_LocationChanged(object sender, EventArgs e)
-        {
-
+            workingData = new EffectTemplateWrapper();
         }
 
         private void procedureText_TextChanged(object sender, EventArgs e)
         {
-            if (!Visible) {
-                return;
-            }
-            string[] procedure = procedureText.Text.Split('\n');
-            workingData.Procedure = procedure;
-
+            CodeDirty = true;
+            SavedChangesLabel.Text = "Unsaved Changes";
+            SavedChangesLabel.ForeColor = System.Drawing.Color.Red;
         }
 
         private void nameText_TextChanged(object sender, EventArgs e)
@@ -48,32 +33,52 @@ namespace DESEditor
             {
                 return;
             }
-            workingData.Name = nameText.Text;
+            workingData.EffectTemplate.Name = nameText.Text;
             Main.Current.workingDataNode.Text = nameText.Text;
         }
 
         private void keywordText_TextChanged(object sender, EventArgs e)
         {
+        }
+
+        public void Populate(EffectTemplateWrapper e)
+        {
+            workingData = e;
+            keywordText.Text = Utils.ListToString(workingData.EffectTemplate.Keywords);
+            procedureText.Text = workingData.RawCode;
+            nameText.Text = workingData.EffectTemplate.Name;
+        }
+
+        private void EffectsPanel_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CompileButton(object sender, EventArgs e)
+        {
+            Tuple<byte[][], int[][]> code;
             if (!Visible)
             {
                 return;
             }
-            string[] kw = keywordText.Text.Trim().Split(',');
-            workingData.Keywords = new List<string>(kw);
-        }
-
-        public void Populate(Effect e) {
-            workingData = e;
-            keywordText.Text = Utils.ListToString(e.Keywords);
-            procedureText.Text = "";
-            for (int i = 0; i < e.Procedure.Length; i++) {
-                procedureText.Text += e.Procedure[i];
-                if (i != e.Procedure.Length - 1) {
-                    procedureText.Text += '\n';
-                }
+            try
+            {
+                code = VM.Compile(procedureText.Text);
             }
-            nameText.Text = e.Name;
-        }
+            catch (Exception error)
+            {
+                SavedChangesLabel.Text = error.Message;
+                SavedChangesLabel.ForeColor = System.Drawing.Color.Red;
+                return;
+            }
 
+            workingData.EffectTemplate.Instruction = code.Item1;
+            workingData.EffectTemplate.ArgIndex = code.Item2;
+            workingData.RawCode = procedureText.Text;
+            CodeDirty = false;
+            SavedChangesLabel.Text = "No Changes";
+            SavedChangesLabel.ForeColor = System.Drawing.Color.Green;
+
+        }
     }
 }

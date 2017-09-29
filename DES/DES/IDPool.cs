@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 public class IDPool : MyObjectPool<int>
     {
-
         public IDPool(int size) {
             pool = new int[size];
         indexlookup = new Dictionary<int, int>();

@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Web;
 using System.Diagnostics;
-
+using System.Reflection;
 namespace DES
 {
     class Program
@@ -16,11 +16,8 @@ namespace DES
         static void Main(string[] args)
         {
             VM VM = new VM();
-
-            Test1();
-            Test2();
-            Test3();
-            Test4();
+            
+            Test5();
         }
 
         public static void Test0() {
@@ -50,6 +47,7 @@ namespace DES
             time.Stop();
             Console.Out.WriteLine(time.ElapsedMilliseconds);
             Console.ReadKey();
+            
         }
 
         public static void Test1() {
@@ -258,6 +256,32 @@ namespace DES
                 c.ActionSys.ProcessEffects();
                 Console.Out.WriteLine(32 - c.HP);
                 Console.ReadKey();
+        }
+
+        public static void Test5() {
+
+            FileStream fs = File.Open("C:\\Users\\FreakingBarbarians\\Desktop\\damage", FileMode.Open);
+
+            BinaryFormatter bf = new BinaryFormatter();
+
+            ActionTemplate at = (ActionTemplate)bf.Deserialize(fs);
+            Character c = new Character("test", 1, 1, 1);
+
+            Console.WriteLine(at.Name);
+            Console.WriteLine(at.Description);
+
+            c.MHP = 1000;
+
+            c.HP = 1000;
+
+            c.Attributes[3] = 500;
+
+            at.DispatchAction(new Item[] { c }, c);
+
+            c.ActionSys.ProcessEffects();
+
+            Console.WriteLine(c.HP);
+            Console.ReadKey();
         }
     }
 }

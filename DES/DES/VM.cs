@@ -7,14 +7,32 @@ using System.Text;
 
 namespace DES
 {
+
+    public enum ExecutionMode : int { STANDARD, END }; // some helpful executionmodes
+
+    public enum InstructionType : int { STANDARD, JUMP};
+
     public class MyInstruction : Attribute {
+        public string Name;
+
         public byte Code;
-        public MyInstruction(byte code) {
+
+        public InstructionType IType;
+
+        public int ArgCount;
+
+        public string[] ArgDescription;
+
+        public MyInstruction(string name, byte code, InstructionType type, int argCount, params string[] argDesc) {
+            this.Name = name;
             this.Code = code;
+            IType = type;
+            ArgCount = argCount;
+            ArgDescription = argDesc;
         }
     }
 
-    public class VM
+    public partial class VM
     {
         public static VM Current;
         public Stack<byte[]> Stack;
@@ -34,6 +52,8 @@ namespace DES
         private int IC; // instruction counter;
 
         public delegate void Instruction();
+
+
 
         public VM() {
             if (Current != null) {
@@ -73,20 +93,20 @@ namespace DES
 
 
         // pushes the object onto the stack
-        // Signature: ITA*
-        [MyInstruction(0)]
+        // Signature: IA*
+        [MyInstruction("Push To Stack" ,0, InstructionType.STANDARD, 1, "Data to push")]
         public void Push() {
-            byte[] toPush = new byte[currentInstruction.Length - 2];
-            Array.Copy(currentInstruction, 2, toPush, 0, currentInstruction.Length - 2);
+            byte[] toPush = new byte[currentInstruction.Length - 1];
+            Array.Copy(currentInstruction, 1, toPush, 0, currentInstruction.Length - 1);
             Stack.Push(toPush);
         }
 
         // Loads bytes from the heap and pushes onto the stack
-        // Signature: ITA*
-        [MyInstruction(1)]
+        // Signature: IA*
+        [MyInstruction("Load From Heap To Stack", 1, InstructionType.STANDARD, 1, "Heap Address")]
         public void Load() {
             byte[] byteAddress = new byte[currentInstruction.Length - 1];
-            Array.Copy(currentInstruction, 2, byteAddress, 0, currentInstruction.Length - 2);
+            Array.Copy(currentInstruction, 1, byteAddress, 0, currentInstruction.Length - 1);
             string address = System.Text.Encoding.UTF8.GetString(byteAddress);
             address = effect.Id.ToString() + address;
             Stack.Push(Heap[address]);
@@ -94,7 +114,7 @@ namespace DES
 
         // saves bytes onto heap
         // Signature: IA*A* (address, data)
-        [MyInstruction(2)]
+        [MyInstruction("Store from Instruction To Heap", 2, InstructionType.STANDARD, 2, "Heap Address", "Data")]
         public void Save() {
             byte[][] splitArgs = splitArguments(currentInstruction, effect.Source.ArgIndex[IC]);
             byte[] byteAddress = splitArgs[0];
@@ -115,7 +135,7 @@ namespace DES
 
         // prints string literal in the instruction
         // Signature: IA
-        [MyInstruction(3)]
+        [MyInstruction("Print", 3, InstructionType.STANDARD, 1, "string")]
         public void IPrintConsole() {
             byte[][] splitargs = splitArguments(currentInstruction, effect.Source.ArgIndex[IC]);
             string printable = Encoding.UTF8.GetString(splitargs[0]);
@@ -124,7 +144,7 @@ namespace DES
 
         // Prints string literal on top of stack
         // Signature: I
-        [MyInstruction(4)]
+        [MyInstruction("Print Stack", 4, InstructionType.STANDARD, 0)]
         public void SPrintConsole() {
             string printable = Encoding.UTF8.GetString(Stack.Pop());
             Console.Out.WriteLine(printable);
@@ -132,7 +152,7 @@ namespace DES
 
         // removes a # of hp from the owners hitbar
         // Signature: #IA
-        [MyInstruction(5)]
+        [MyInstruction("Damage Health I", 5, InstructionType.STANDARD, 1, "Damage")]
         public void IDamageHealth() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int damage = BitConverter.ToInt32(splitargs[0], 0);
@@ -145,7 +165,7 @@ namespace DES
 
         // removes a # of hp from the owner's hitbar. The amount is the first item on the stack.
         // Signature: #I
-        [MyInstruction(6)]
+        [MyInstruction("Damage Health S", 6, InstructionType.STANDARD,0)]
         public void SDamageHealth() {
             byte[] num = Stack.Pop();
             int damage = BitConverter.ToInt32(num, 0);
@@ -158,7 +178,7 @@ namespace DES
 
         // rolls and pushes to stack, the result of xdy dice. x dice with y sides
         // Signature: IAA, A is int
-        [MyInstruction(7)]
+        [MyInstruction("Roll dice", 7, InstructionType.STANDARD, 2, "Dice", "ySides")]
         public void IRollDice() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int x = BitConverter.ToInt32(splitargs[0], 0);
@@ -168,7 +188,7 @@ namespace DES
 
         // adds 2 immediate values
         // IAA, A is int
-        [MyInstruction(8)]
+        [MyInstruction("Add Immediate", 8, InstructionType.STANDARD, 2, "a", "b")]
         public void IAddI() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int a = BitConverter.ToInt32(splitargs[0], 0);
@@ -178,7 +198,7 @@ namespace DES
 
         // adds 2 stack values
         // I
-        [MyInstruction(9)]
+        [MyInstruction("Add Stack", 9, InstructionType.STANDARD, 0)]
         public void SAddS() {
             int b = BitConverter.ToInt32(Stack.Pop(), 0);
             int a = BitConverter.ToInt32(Stack.Pop(), 0);
@@ -187,7 +207,7 @@ namespace DES
 
         // Pushes to the stack the scaling value of an attribute
         // IA*A*, scaling attribute, scale factor
-        [MyInstruction(10)]
+        [MyInstruction("Scale With Attribute", 10, InstructionType.STANDARD, 2, "Scaling Attribute", "Scale Factor")]
         public void IScale() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int a = BitConverter.ToInt32(splitargs[0], 0);
@@ -199,7 +219,7 @@ namespace DES
         // Jumps so that the specified instruction is the next one
         // I.e. pass 15, and it will jump to 14, so next ins is 15
         // IA*
-        [MyInstruction(11)]
+        [MyInstruction("Jump To I", 11, InstructionType.JUMP, 1, "Line")]
         public void IJump() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int pos = BitConverter.ToInt32(splitargs[0],0);
@@ -210,7 +230,7 @@ namespace DES
 
         // IJump but the pos comes from the stack
         // I
-        [MyInstruction(12)]
+        [MyInstruction("Jump To S", 12, InstructionType.JUMP, 0)]
         public void SJump() {
             int pos = BitConverter.ToInt32(Stack.Pop(), 0);
             pos--;
@@ -220,8 +240,8 @@ namespace DES
         // Jumps to X if A  == B. where X and A are in the instruction set, B is on stack
         // makes no sense to put A and B in instruction set since you would know the answer always
         // IA*A*, A, X
-        [MyInstruction(13)]
-        public void IJumpEQI() {
+        [MyInstruction("Jump if Equal I", 13, InstructionType.JUMP, 2, "To Equate", "Line")]
+        public void IJumpEQ() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int pos = BitConverter.ToInt32(splitargs[1], 0);
 
@@ -234,8 +254,8 @@ namespace DES
 
         // jumps to X if A == B where X is in the instruction set, A and B are on stack.
         // IA*, X
-        [MyInstruction(14)]
-        public void IJumpEQS() {
+        [MyInstruction("Jump if Equal S", 14, InstructionType.JUMP, 1, "Line")]
+        public void SJumpEQ() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int pos = BitConverter.ToInt32(splitargs[0], 0);
 
@@ -246,7 +266,7 @@ namespace DES
 
         // pushes the value at register index to stack
         // IA*, regposition
-        [MyInstruction(15)]
+        [MyInstruction("Get Register", 15, InstructionType.STANDARD, 1, "Register Address")]
         public void GetRegister() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int index = BitConverter.ToInt32(splitargs[0], 0);
@@ -258,7 +278,7 @@ namespace DES
         // stores value at register index
         // The value is come from instruction
         // IA*A*, regpos, value
-        [MyInstruction(16)]
+        [MyInstruction("Store Register I", 16, InstructionType.STANDARD, 2, "Register Address", "Value")]
         public void IStoreRegister() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int index = BitConverter.ToInt32(splitargs[0], 0);
@@ -268,18 +288,44 @@ namespace DES
         // stores the value at register index.
         // the value is come from stack
         // IA*, regpos
-        [MyInstruction(17)]
+        [MyInstruction("Store Register S", 17, InstructionType.STANDARD, 1, "Register Address")]
         public void SStoreRegister() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int index = BitConverter.ToInt32(splitargs[0], 0);
             Registers[index] = Stack.Pop();
         }
 
-        // 
-        [MyInstruction(18)]
+        // retrievs and pushes the execution mode of the current 
+        // effect onto the stack
+        // I
+        [MyInstruction("Get Execution Mode", 18, InstructionType.STANDARD, 0)]
+        public void GetExecutionMode() {
+            Stack.Push(BitConverter.GetBytes((int) effect.ExecutionMode));
+        }
 
+        // compares an integer provided in the instructions.
+        // jumps to the position provided in pos 1 if...
+        // TODO: Come up with a better documentation scheme
+        // IA*A*, int to be compared, position of next instruction
+        [MyInstruction("Jump if I Less Than S", 19, InstructionType.STANDARD, 2, "I", "Line")]
+        public void IJumpLT() {
+            byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
+            int pos = BitConverter.ToInt32(splitargs[1], 0);
+            int num = BitConverter.ToInt32(splitargs[0], 0);
+            if (num < BitConverter.ToInt32(Stack.Pop(), 0)) {
+                IC = --pos;
+            }
+        }
 
-
+        [MyInstruction("Jump if S Less Than S", 20, InstructionType.STANDARD, 0)]
+        public void SJumpLT() {
+            byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
+            int pos = BitConverter.ToInt32(splitargs[0], 0);
+            if (BitConverter.ToInt32(Stack.Pop(), 0) < BitConverter.ToInt32(Stack.Pop(), 0)) {
+                IC = --pos;
+            }
+        }
+        
         // other shit.
         
         // a simpler set register for c# code to call.
@@ -293,6 +339,7 @@ namespace DES
         public byte[][] splitArguments(byte[] args, int[] index) {
 
             byte[][] splitArgs = new byte[index.Length][];
+
             for (int i = 0; i < index.Length; i++) {
                 byte[] p;
                 if (i == index.Length - 1)
@@ -318,6 +365,5 @@ namespace DES
         public static byte TypeToByte(Type type) {
             return 0;
         }
-
     }
 }

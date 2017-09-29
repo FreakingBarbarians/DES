@@ -52,6 +52,7 @@
     <Compile Include="ActionOverviewPanel.Designer.cs">
       <DependentUpon>ActionOverviewPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Wrappers.cs" />
     <Compile Include="EffectsPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

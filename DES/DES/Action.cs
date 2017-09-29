@@ -6,17 +6,35 @@ using System.Threading.Tasks;
 
 namespace DES
 {
+    [Serializable]
     public struct ActionDispatchInfo
     {
         // info
     }
 
+    [Serializable]
     public struct ActionVariable {
         public string[] Keywords;
         public byte[] Data;
         public Type dataType;
     }
 
+    [Serializable]
+    public class ActionRequirement
+    {
+        public string Requirement;
+        public int amount;
+        public bool consume;
+
+        public ActionRequirement()
+        {
+            Requirement = "";
+            amount = 0;
+            consume = false;
+        }
+    }
+
+    [Serializable]
     public class Action
     {
         public Dictionary<string, ActionVariable> LocalVars;

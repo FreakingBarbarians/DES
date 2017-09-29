@@ -14,25 +14,25 @@ namespace DESEditor
     public partial class ActionOverviewPanel : UserControl
     {
 
-        public ActionTemplate workingData;
+        public ActionTemplateWrapper workingData;
 
         public ActionOverviewPanel()
         {
             InitializeComponent();
-            workingData = new ActionTemplate();
+            workingData = new ActionTemplateWrapper();
         }
 
         private void label1_Click(object sender, EventArgs e)
         {
         }
 
-        public void Populate(ActionTemplate AT) {
-            nameText.Text = AT.Name;
-            descriptionText.Text = AT.Description;
-            targetCombo.SelectedIndex = AT.TargetType;
-            rangeNum.Value = AT.Range;
-            altRangeNum.Value = AT.Range2;
-            workingData = AT;
+        public void Populate(ActionTemplateWrapper ATW) {
+            nameText.Text = ATW.ActionTemplate.Name;
+            descriptionText.Text = ATW.ActionTemplate.Description;
+            targetCombo.SelectedIndex = ATW.ActionTemplate.TargetType;
+            rangeNum.Value = ATW.ActionTemplate.Range;
+            altRangeNum.Value = ATW.ActionTemplate.Range2;
+            workingData = ATW;
         }
 
         private void targetCombo_SelectedIndexChanged(object sender, EventArgs e)
@@ -41,7 +41,7 @@ namespace DESEditor
                 return;
             }
 
-            workingData.TargetType = targetCombo.SelectedIndex;
+            workingData.ActionTemplate.TargetType = targetCombo.SelectedIndex;
 
         }
 
@@ -55,7 +55,7 @@ namespace DESEditor
             if (!Visible) {
                 return;
             }
-            workingData.Name = nameText.Text;
+            workingData.ActionTemplate.Name = nameText.Text;
             Main.Current.workingDataNode.Text = nameText.Text;
         }
 
@@ -64,7 +64,7 @@ namespace DESEditor
             if (!Visible) {
                 return;
             }
-            workingData.Description = descriptionText.Text;
+            workingData.ActionTemplate.Description = descriptionText.Text;
 
         }
 
@@ -74,12 +74,12 @@ namespace DESEditor
                 return;
             }
 
-            workingData.Range = (int) rangeNum.Value;
+            workingData.ActionTemplate.Range = (int) rangeNum.Value;
         }
 
         private void altRangeNum_ValueChanged(object sender, EventArgs e)
         {
-            workingData.Range2 = (int) altRangeNum.Value;
+            workingData.ActionTemplate.Range2 = (int) altRangeNum.Value;
         }
     }
 }

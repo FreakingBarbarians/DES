@@ -26,7 +26,8 @@ namespace DESEditor
             
         }
 
-        public void Populate(ActionRequirement RQ) {
+        public void Populate(ActionRequirementWrapper RQW) {
+            ActionRequirement RQ = RQW.ActionRequirement;
             requirementBox.Text = RQ.Requirement;
             amountNum.Value = RQ.amount;
             consumeCheck.Checked = RQ.consume;

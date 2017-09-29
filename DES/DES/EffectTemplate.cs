@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DES
 {
+    [Serializable]
     public class EffectTemplate
     {
         public string Name;
@@ -23,7 +24,7 @@ namespace DES
             Instruction[0] = new byte[1];
             ArgIndex = new int[1][];
             ArgIndex[0] = new int[1];
-            Keywords = new string[1];
+            Keywords = new string[] { "" };
             Name = "UNDEFINED";
         }
     }

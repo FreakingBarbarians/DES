@@ -47,6 +47,7 @@
     <Compile Include="Action.cs" />
     <Compile Include="ActionSystem.cs" />
     <Compile Include="ActionSystem.Events.cs" />
+    <Compile Include="VM.Util.cs" />
     <Compile Include="EffectTemplate.cs" />
     <Compile Include="DESUtils.cs" />
     <Compile Include="Effect.cs" />

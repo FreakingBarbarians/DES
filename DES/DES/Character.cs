@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DES
 {
-
+    [Serializable]
     public abstract class AttributeInfo {
         public static int STR = 0;
         public static int DEX = 1;
@@ -16,6 +16,7 @@ namespace DES
         public static int CHA = 5;
     }
 
+    [Serializable]
     public class Character : Item
     {
 

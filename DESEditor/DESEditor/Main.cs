@@ -22,22 +22,24 @@ namespace DESEditor
         RequirementPanel RQPanel;
         EffectsPanel EFPanel;
 
-        public Dictionary<string, ActionTemplate> Data;
-        public Dictionary<string, Effect> effects;
-        public Dictionary<string, ActionRequirement> Requirements;
+        public Dictionary<string, ActionTemplateWrapper> Data;
+        public Dictionary<string, EffectTemplateWrapper> effects;
+        public Dictionary<string, ActionRequirementWrapper> Requirements;
         public static Main Current;
         public TreeView TV;
         public TreeNode workingDataNode;
         public TreeNode contextDataNode;
+
+        public static VM vm;
 
         IDPool Ids;
 
         public Main()
         {
             InitializeComponent();
-            Data = new Dictionary<string, ActionTemplate>();
-            effects = new Dictionary<string, Effect>();
-            Requirements = new Dictionary<string, ActionRequirement>();
+            Data = new Dictionary<string, ActionTemplateWrapper>();
+            effects = new Dictionary<string, EffectTemplateWrapper>();
+            Requirements = new Dictionary<string, ActionRequirementWrapper>();
             AOPanel = new ActionOverviewPanel();
             RQPanel = new RequirementPanel();
             EFPanel = new EffectsPanel();
@@ -45,8 +47,10 @@ namespace DESEditor
             Current = this;
             TV = tv;
             workingDataNode = new TreeNode(); // dummy vars;
-            saveFileDialog1.DefaultExt = ".ACT";
+            saveActionDialog.DefaultExt = ".ACT";
             openFileDialog1.DefaultExt = ".ACT";
+
+            vm = new VM();
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -139,83 +143,59 @@ namespace DESEditor
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
-            BinaryFormatter f = new BinaryFormatter();
-            Stream s = openFileDialog1.OpenFile();
-            // maybe add some security here.
-            ActionTemplate act = (ActionTemplate) f.Deserialize(s);
+            //BinaryFormatter f = new BinaryFormatter();
+            //Stream s = openFileDialog1.OpenFile();
+            //// maybe add some security here.
+            //ActionTemplate act = (ActionTemplate) f.Deserialize(s);
 
-            TreeNode t = tv.Nodes.Add("New Action");
-            t.Text = act.Name;
-            t.Name = Ids.Get().ToString();
-            Console.Out.WriteLine(t.Name);
-            Data.Add(t.Name, act);
+            //TreeNode t = tv.Nodes.Add("New Action");
+            //t.Text = act.Name;
+            //t.Name = Ids.Get().ToString();
+            //Console.Out.WriteLine(t.Name);
+            //Data.Add(t.Name, act);
 
-            TreeNode Req;
-            TreeNode Int;
-            TreeNode Tick;
-            TreeNode Trig;
-            TreeNode End;
-            (Req = t.Nodes.Add("Requirements")).ForeColor = Color.Blue;
-            (Int = t.Nodes.Add("InitialEffects")).ForeColor = Color.Blue;
-            (Tick = t.Nodes.Add("TickingEffects")).ForeColor = Color.Blue;
-            (Trig = t.Nodes.Add("TriggeredEffects")).ForeColor = Color.Blue;
-            (End = t.Nodes.Add("EndEffects")).ForeColor = Color.Blue;
+            //TreeNode Req;
+            //TreeNode Effects;
 
-            foreach (ActionRequirement r in act.Requirements) {
-                TreeNode node = Req.Nodes.Add("");
-                node.Name = Ids.Get().ToString();
-                node.Text = r.Requirement;
-                Requirements.Add(node.Name, r);
-            }
+            //(Req = t.Nodes.Add("Requirements")).ForeColor = Color.Blue;
+            //(Effects = t.Nodes.Add("Effects")).ForeColor = Color.Blue;
+            //foreach (ActionRequirement r in act.Requirements) {
+            //    TreeNode node = Req.Nodes.Add("");
+            //    node.Name = Ids.Get().ToString();
+            //    node.Text = r.Requirement;
+            //    Requirements.Add(node.Name, r);
+            //}
 
-            foreach (Effect eff in act.InitialEffects) {
-                TreeNode node = Int.Nodes.Add(eff.Name);
-                node.Name = Ids.Get().ToString();
-                effects.Add(node.Name, eff);
-            }
+            //foreach (EffectTemplate eft in act.Effects) {
+            //    TreeNode node = Effects.Nodes.Add("");
+            //    node.Name = Ids.Get().ToString();
+            //    node.Text = eft.Name;
+            //    effects.Add(node.Name, eft);
+            //}
 
-            foreach (Effect eff in act.TickingEffects) {
-                TreeNode node = Tick.Nodes.Add(eff.Name);
-                node.Name = Ids.Get().ToString();
-                effects.Add(node.Name, eff);
-            }
-
-            foreach (Effect eff in act.TriggeredEffects)
-            {
-                TreeNode node = Trig.Nodes.Add(eff.Name);
-                node.Name = Ids.Get().ToString();
-                effects.Add(node.Name, eff);
-            }
-
-            foreach (Effect eff in act.EndEffects)
-            {
-                TreeNode node = End.Nodes.Add(eff.Name);
-                node.Name = Ids.Get().ToString();
-                effects.Add(node.Name, eff);
-            }
         }
 
         private void NewAction(object sender, EventArgs e)
         {
             HideAllDynamicMenus();
+            HideAllContextMenus();
 
             TreeNode t = tv.Nodes.Add("New Action");
             t.Name = Ids.Get().ToString();
             Console.Out.WriteLine(t.Name);
             t.Nodes.Add("Requirements").ForeColor = Color.Blue;
-            t.Nodes.Add("InitialEffects").ForeColor = Color.Blue;
-            t.Nodes.Add("TickingEffects").ForeColor = Color.Blue;
-            t.Nodes.Add("TriggeredEffects").ForeColor = Color.Blue;
-            t.Nodes.Add("EndEffects").ForeColor = Color.Blue;
+            t.Nodes.Add("Effects").ForeColor = Color.Blue;
             
             ActionTemplate AT = new ActionTemplate();
+            ActionTemplateWrapper ATW = new ActionTemplateWrapper();
+            ATW.ActionTemplate = AT;
+
             AT.Name = "New Action";
             AT.Description = "Type here!";
-            Data.Add(t.Name, AT);
+            Data.Add(t.Name, ATW);
             tv.SelectedNode = t;
             workingDataNode = t;
-
-            ShowAO(AT);
+            ShowAO(ATW);
         }
 
         private void HideAllContextMenus() {
@@ -230,94 +210,91 @@ namespace DESEditor
             RQPanel.Hide();
         }
 
-        private void ShowAO(ActionTemplate AT) {
+        private void ShowAO(ActionTemplateWrapper ATW) {
             AOPanel.Parent = DynamicSpace;
             AOPanel.Dock = DockStyle.Fill;
-            AOPanel.Populate(AT);
+            AOPanel.Populate(ATW);
             AOPanel.Show();
         }
 
-        private void ShowEP(Effect EF) {
+        private void ShowEP(EffectTemplateWrapper EF) {
             EFPanel.Parent = DynamicSpace;
             EFPanel.Dock = DockStyle.Fill;
             EFPanel.Populate(EF);
             EFPanel.Show();
         }
 
-        private void ShowRQ(ActionRequirement RQ) {
+        private void ShowRQ(ActionRequirementWrapper RQW) {
             RQPanel.Parent = DynamicSpace;
             RQPanel.Dock = DockStyle.Fill;
-            RQPanel.Populate(RQ);
+            RQPanel.Populate(RQW);
             RQPanel.Show();
         }
 
-        private void addRequirementToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddRequirementToolstripItem(object sender, EventArgs e)
         {
             HideAllDynamicMenus();
             HideAllContextMenus();
-            ActionTemplate at = Data[contextDataNode.Parent.Name];
+            ActionTemplateWrapper ATW = Data[contextDataNode.Parent.Name];
             TreeNode t = contextDataNode.Nodes.Add("NewRequirement");
             t.Name = Ids.Get().ToString();
-            ActionRequirement rq = new ActionRequirement();
-            rq.Requirement = "new requirement";
-            rq.amount = 0;
-            rq.consume = false;
-            Requirements.Add(t.Name, rq);
-            at.Requirements.Add(rq);
-            ShowRQ(rq);
+
+            ActionRequirement RQ = new ActionRequirement();
+            RQ.Requirement = "new requirement";
+            RQ.amount = 0;
+            RQ.consume = false;
+
+            ActionRequirementWrapper RQW = new ActionRequirementWrapper();
+            RQW.ActionRequirement = RQ;
+
+            Requirements.Add(t.Name, RQW);
+            List<ActionRequirement> tempList = new List<ActionRequirement>(ATW.ActionTemplate.Requirements);
+            tempList.Add(RQ);
+            ATW.ActionTemplate.Requirements = tempList.ToArray();
+            ShowRQ(RQW);
         }
 
-        private void testAddToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddEffectToolstripItem(object sender, EventArgs e)
         {
             HideAllDynamicMenus();
             HideAllContextMenus();
+
+            // action owner of new effect
+            ActionTemplateWrapper ownerWrapper = Data[contextDataNode.Parent.Name];
+            // new node in tree
             TreeNode t = contextDataNode.Nodes.Add("NewEffect");
             workingDataNode = t;
+            // get id for this new node
             t.Name = Ids.Get().ToString();
-            Effect eff;
-            if (t.Parent.Text == "InitialEffects")
-            {
-                eff = new Effect();
-                Data[t.Parent.Parent.Name].InitialEffects.Add(eff);
+            EffectTemplate eff = new EffectTemplate();
 
-            }
-            else if (t.Parent.Text == "TickingEffects") {
-                eff = new Effect();
-                Data[t.Parent.Parent.Name].TickingEffects.Add(eff);
+            EffectTemplateWrapper efp = new EffectTemplateWrapper();
+            efp.EffectTemplate = eff;
+            
+            // add wrapper to dictionary
+            effects.Add(t.Name, efp);
 
-            }
-            else if (t.Parent.Text == "TriggeredEffects") {
-                eff = new Effect();
-                Data[t.Parent.Parent.Name].TriggeredEffects.Add(eff);
-            }
-            else {
-                eff = new Effect();
-                Data[t.Parent.Parent.Name].EndEffects.Add(eff);
-            }
-            effects.Add(t.Name, eff);
-            ShowEP(eff);
+            // update owner action
+            List<EffectTemplate> tempList = new List<EffectTemplate>(ownerWrapper.ActionTemplate.Effects);
+            tempList.Add(eff);
+            ownerWrapper.ActionTemplate.Effects = tempList.ToArray();
+
+            // update owner wrapper
+            ownerWrapper.effects.Add(efp);
+
+            ShowEP(efp);
         }
 
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeleteEffectToolstripItem(object sender, EventArgs e)
         {
-            ActionTemplate owner = Data[contextDataNode.Parent.Parent.Name];
-            Effect toBeDeleted = effects[contextDataNode.Name];
+            ActionTemplateWrapper ownerWrapper = Data[contextDataNode.Parent.Parent.Name];
+            EffectTemplateWrapper toBeDeleted = effects[contextDataNode.Name];
             effects.Remove(contextDataNode.Name);
-            string type = contextDataNode.Parent.Text;
-            switch (type) {
-                case "InitialEffects":
-                    owner.InitialEffects.Remove(toBeDeleted);
-                    break;
-                case "TickingEffects":
-                    owner.TickingEffects.Remove(toBeDeleted);
-                    break;
-                case "TriggeredEffects":
-                    owner.TriggeredEffects.Remove(toBeDeleted);
-                    break;
-                case "EndEffects":
-                    owner.EndEffects.Remove(toBeDeleted);
-                    break;
-            }
+
+            List<EffectTemplate> tempList = new List<EffectTemplate>(ownerWrapper.ActionTemplate.Effects);
+            tempList.Remove(toBeDeleted.EffectTemplate);
+            ownerWrapper.ActionTemplate.Effects = tempList.ToArray();
+
             Ids.Free(int.Parse(contextDataNode.Name));
             contextDataNode.Parent.Nodes.Remove(contextDataNode);
         }
@@ -335,18 +312,50 @@ namespace DESEditor
             }
             tv.SelectedNode = t;
             
-            saveFileDialog1.ShowDialog();
+            saveActionDialog.ShowDialog();
+        }
+
+        private void exportCurrentAction(object sender, EventArgs e)
+        {
+            TreeNode t = tv.SelectedNode;
+
+            if (t == null)
+            {
+                return;
+            }
+
+            while (t.Level > 0)
+            {
+                t = t.Parent;
+            }
+            tv.SelectedNode = t;
+
+            exportActionDialog.ShowDialog();
         }
 
         private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
-            ActionTemplate AT = Data[tv.SelectedNode.Name];
-            Stream s = saveFileDialog1.OpenFile();
+            saveActionDialog.DefaultExt = ".ACTE";
+            ActionTemplateWrapper ATW = Data[tv.SelectedNode.Name];
+            Stream s = saveActionDialog.OpenFile();
             BinaryFormatter bn = new BinaryFormatter();
-            bn.Serialize(s, AT);
+            bn.Serialize(s, ATW);
             s.Close();
         }
 
+        private void exportActionDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            saveActionDialog.DefaultExt = ".ACT";
+            ActionTemplateWrapper ATW = Data[tv.SelectedNode.Name];
+            Stream s = exportActionDialog.OpenFile();
+            BinaryFormatter bn = new BinaryFormatter();
+            bn.Serialize(s, ATW.ActionTemplate);
+            s.Close();
+        }
 
+        private void DynamicSpace_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

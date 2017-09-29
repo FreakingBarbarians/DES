@@ -34,6 +34,8 @@
             this.procedureText = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.nameText = new System.Windows.Forms.TextBox();
+            this.compileButton = new System.Windows.Forms.Button();
+            this.SavedChangesLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -44,7 +46,6 @@
             this.label1.Size = new System.Drawing.Size(53, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Keywords";
-            this.label1.Click += new System.EventHandler(this.label1_Click_1);
             // 
             // keywordText
             // 
@@ -52,7 +53,6 @@
             this.keywordText.Name = "keywordText";
             this.keywordText.Size = new System.Drawing.Size(639, 20);
             this.keywordText.TabIndex = 1;
-            this.keywordText.LocationChanged += new System.EventHandler(this.textBox1_LocationChanged);
             this.keywordText.TextChanged += new System.EventHandler(this.keywordText_TextChanged);
             // 
             // label2
@@ -66,9 +66,10 @@
             // 
             // procedureText
             // 
+            this.procedureText.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.procedureText.Location = new System.Drawing.Point(11, 80);
             this.procedureText.Name = "procedureText";
-            this.procedureText.Size = new System.Drawing.Size(695, 301);
+            this.procedureText.Size = new System.Drawing.Size(695, 262);
             this.procedureText.TabIndex = 3;
             this.procedureText.Text = "";
             this.procedureText.TextChanged += new System.EventHandler(this.procedureText_TextChanged);
@@ -90,12 +91,34 @@
             this.nameText.TabIndex = 5;
             this.nameText.TextChanged += new System.EventHandler(this.nameText_TextChanged);
             // 
+            // compileButton
+            // 
+            this.compileButton.Location = new System.Drawing.Point(530, 348);
+            this.compileButton.Name = "compileButton";
+            this.compileButton.Size = new System.Drawing.Size(176, 32);
+            this.compileButton.TabIndex = 6;
+            this.compileButton.Text = "Compile";
+            this.compileButton.UseVisualStyleBackColor = true;
+            this.compileButton.Click += new System.EventHandler(this.CompileButton);
+            // 
+            // SavedChangesLabel
+            // 
+            this.SavedChangesLabel.AutoSize = true;
+            this.SavedChangesLabel.ForeColor = System.Drawing.Color.Green;
+            this.SavedChangesLabel.Location = new System.Drawing.Point(8, 358);
+            this.SavedChangesLabel.Name = "SavedChangesLabel";
+            this.SavedChangesLabel.Size = new System.Drawing.Size(66, 13);
+            this.SavedChangesLabel.TabIndex = 7;
+            this.SavedChangesLabel.Text = "No Changes";
+            // 
             // EffectsPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.Controls.Add(this.SavedChangesLabel);
+            this.Controls.Add(this.compileButton);
             this.Controls.Add(this.nameText);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.procedureText);
@@ -105,6 +128,7 @@
             this.MinimumSize = new System.Drawing.Size(722, 396);
             this.Name = "EffectsPanel";
             this.Size = new System.Drawing.Size(722, 396);
+            this.Load += new System.EventHandler(this.EffectsPanel_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -118,5 +142,7 @@
         private System.Windows.Forms.RichTextBox procedureText;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox nameText;
+        private System.Windows.Forms.Button compileButton;
+        private System.Windows.Forms.Label SavedChangesLabel;
     }
 }

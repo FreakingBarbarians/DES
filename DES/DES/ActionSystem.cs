@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DES
 {
+    [Serializable]
     public partial class ActionEffectSystem // maybe we just combine them?
     {
 
@@ -13,7 +14,7 @@ namespace DES
         public List<Action> RemovedAction;
         public List<Effect> RemovedEffects;
 
-        public List<Effect> RunEffects;
+        public List<Effect> RanEffects;
 
         public Item Owner;
 
@@ -27,7 +28,7 @@ namespace DES
             ActiveActions = new List<Action>();
             RemovedAction = new List<Action>();
             RemovedEffects = new List<Effect>();
-            RunEffects = new List<Effect>();
+            RanEffects = new List<Effect>();
 
             EffectActionMap = new Dictionary<Effect, Action>();
             ActionEffectCounter = new Dictionary<Action, int>();
@@ -58,6 +59,9 @@ namespace DES
         public void RemoveEffect(Effect e) {
             // notify that the action is done
 
+            e.ExecutionMode = ExecutionMode.END;
+            VM.Current.Execute(e, this.Owner);
+
             RemovedEffects.Add(e);
             ActionEffectCounter[e.Owner]--;
             if (ActionEffectCounter[e.Owner] < 1) {
@@ -86,16 +90,16 @@ namespace DES
             RemovedAction.Clear();
 
             foreach (Effect e in EffectActionMap.Keys) {
-                if (!RemovedEffects.Contains(e) && !RunEffects.Contains(e)) {
+                if (!RemovedEffects.Contains(e) && !RanEffects.Contains(e)) {
                     VM.Current.Execute(e, this.Owner);
-                    RunEffects.Add(e);
+                    RanEffects.Add(e);
                 }
             }
 
             foreach (Effect e in RemovedEffects) {
                 DeleteEffect(e);
             }
-            RunEffects.Clear();
+            RanEffects.Clear();
             RemovedEffects.Clear();
         }
     }
