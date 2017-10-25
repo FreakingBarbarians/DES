@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System;
 using MyUtils;
-/*  Generic pool
+
+/*  
+    Generic pool
     User is responsible for initialization/setting up of
     Objects requested from the pool
 */
+
 public class MyObjectPool<T> {
 
-    public T[] pool;                        // the pool
-    public Dictionary<T, int> indexlookup;  // lookup for index of objects
-    protected int size;                       // num objects in pool
-    protected int front;                      // front of free objects
-    protected int back;                       // back of free objects
-    protected int freecount;                  // # of free objects in pool
+    public T[] pool;                            // the pool
+    public Dictionary<T, int> indexlookup;      // lookup for index of objects
+    protected int size;                         // num objects in pool
+    protected int front;                        // front of free objects
+    protected int back;                         // back of free objects
+    protected int freecount;                    // # of free objects in pool
 
     public MyObjectPool(int size, params System.Object[] args){
         pool = new T[size];
@@ -29,18 +32,28 @@ public class MyObjectPool<T> {
             pool[i] = (T)constructorInfo.Invoke(args);
             indexlookup.Add(pool[i], i);
         }
+
         front = 0;
         back = size - 1;
     }
 
-    protected MyObjectPool() {
+    public MyObjectPool(Array<T>[] items) {
+        pool = items;
+        indexlookup = new Dictionary<T, int>();
+        freecount = size;
 
+        for (int i = 0; i < size; i++)
+        {
+            indexlookup.Add(pool[i], i);
+        }
+
+        front = 0;
+        back = size - 1;
     }
-
 
     public T Get() {
         if (freecount < 1) {
-            return default(T);
+            throw new System.Exception("Pool is empty");
         }
 
         T returnable = pool[front];
@@ -69,5 +82,4 @@ public class MyObjectPool<T> {
         indexlookup[Object] = back;
         indexlookup[p] = t;
     }
-
 }

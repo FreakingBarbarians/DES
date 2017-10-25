@@ -53,8 +53,6 @@ namespace DES
 
         public delegate void Instruction();
 
-
-
         public VM() {
             if (Current != null) {
                 throw new Exception("Two instances of VM created");
@@ -90,7 +88,6 @@ namespace DES
         // I preceeding the instruction means Immediate, the value that the instructions are concerned with are inside the instruction itself
         // S meaning stack,  the value that the instructions are concerned with are in the stack
         // M for memory? maybe idk.
-
 
         // pushes the object onto the stack
         // Signature: IA*
@@ -179,7 +176,7 @@ namespace DES
         // rolls and pushes to stack, the result of xdy dice. x dice with y sides
         // Signature: IAA, A is int
         [MyInstruction("Roll dice", 7, InstructionType.STANDARD, 2, "Dice", "ySides")]
-        public void IRollDice() {
+        public void IRollDiceI() {
             byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
             int x = BitConverter.ToInt32(splitargs[0], 0);
             int y = BitConverter.ToInt32(splitargs[1], 0);
@@ -325,9 +322,62 @@ namespace DES
                 IC = --pos;
             }
         }
-        
+
+        [MyInstruction("Multiplies top stack number with argument and pushes to stack", 21, InstructionType.STANDARD, 0)]
+        public void IMultS() {
+            byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
+            int a = BitConverter.ToInt32(splitargs[0], 0);
+            int b = BitConverter.ToInt32(Stack.Pop(), 0);
+            Stack.Push(BitConverter.GetBytes(a * b));
+        }
+        [MyInstruction("Multiplies top 2 things on stack and pushes to stack", 22, InstructionType.STANDARD, 0)]
+        public void SMultS() {
+            int a = BitConverter.ToInt32(Stack.Pop(), 0);
+            int b = BitConverter.ToInt32(Stack.Pop(), 0);
+            Stack.Push(BitConverter.GetBytes(a * b));
+        }
+
+        // rolls and pushes to stack, the result of xdy dice. x dice with y sides
+        // Signature: IAA, A is int
+        [MyInstruction("Roll dice", 23, InstructionType.STANDARD, 2, "Dice", "ySides")]
+        public void SRollDiceI()
+        {
+            byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
+            int x = BitConverter.ToInt32(Stack.Pop(), 0);
+            int y = BitConverter.ToInt32(splitargs[0], 0);
+            Stack.Push(BitConverter.GetBytes(MyUtils.Utils.RollDice(x, y)));
+        }
+
+        [MyInstruction("Roll dice", 24, InstructionType.STANDARD, 2, "Dice", "ySides")]
+        public void IRollDiceS()
+        {
+            byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
+            int x = BitConverter.ToInt32(splitargs[0], 0);
+            int y = BitConverter.ToInt32(Stack.Pop(), 0);
+            Stack.Push(BitConverter.GetBytes(MyUtils.Utils.RollDice(x, y)));
+        }
+
+        [MyInstruction("Roll dice", 25, InstructionType.STANDARD, 2, "Dice", "ySides")]
+        public void SRollDiceS()
+        {
+            int x = BitConverter.ToInt32(Stack.Pop(), 0);
+            int y = BitConverter.ToInt32(Stack.Pop(), 0);
+            Stack.Push(BitConverter.GetBytes(MyUtils.Utils.RollDice(x, y)));
+        }
+
+        // adds 2 stack values
+        // I
+        [MyInstruction("Add Stack", 26, InstructionType.STANDARD, 0)]
+        public void SAddI()
+        {
+            byte[][] splitargs = splitArguments(currentInstruction, currentIndex);
+            int b = BitConverter.ToInt32(splitargs[0], 0);
+            int a = BitConverter.ToInt32(Stack.Pop(), 0);
+            Stack.Push(BitConverter.GetBytes(a + b));
+        }
+
         // other shit.
-        
+
         // a simpler set register for c# code to call.
         // Intended to push action.localvar variables to the VM
         public void SetRegister(int regnumber, byte[] data) {
