@@ -26,7 +26,7 @@ Immediately we can distill some requirements for our definition of an action.
 We can break the action down into two parts:
 
 ##### A Header
-Contains that describes the action and "how" the action is applied to targets. It contains fields such as:
+Describes the action and "how" the action is applied to targets. It contains fields such as:
 * Name
 * Description
 * Keywords (think elemental typing for actions)
